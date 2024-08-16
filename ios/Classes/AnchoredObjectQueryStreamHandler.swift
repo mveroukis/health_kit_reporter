@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import HealthKitReporter
 
 public final class AnchoredObjectQueryStreamHandler: NSObject {
     public let reporter: HealthKitReporter

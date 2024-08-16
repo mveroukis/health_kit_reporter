@@ -113,6 +113,10 @@ enum QuantityType {
   atrialFibrillationBurden,
   underwaterDepth,
   waterTemperature,
+
+  cyclingCadence,
+  cyclingPower,
+  cyclingSpeed
 }
 
 extension QuantityTypeIdentifier on QuantityType {
@@ -324,6 +328,14 @@ extension QuantityTypeIdentifier on QuantityType {
         return 'HKQuantityTypeIdentifierUnderwaterDepth';
       case QuantityType.waterTemperature:
         return 'HKQuantityTypeIdentifierWaterTemperature';
+
+      // iOS 17+
+      case QuantityType.cyclingCadence:
+        return 'HKQuantityTypeIdentifierCyclingCadence';
+      case QuantityType.cyclingPower:
+        return 'HKQuantityTypeIdentifierCyclingPower';
+      case QuantityType.cyclingSpeed:
+        return 'HKQuantityTypeIdentifierCyclingSpeed';
     }
   }
 }

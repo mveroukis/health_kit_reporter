@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import HealthKitReporter
 
 @available(iOS 9.3, *)
 public final class QueryActivitySummaryStreamHandler: NSObject {

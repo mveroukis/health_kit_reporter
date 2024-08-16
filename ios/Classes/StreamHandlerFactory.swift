@@ -5,8 +5,6 @@
 //  Created by Kachalov, Victor on 11.04.21.
 //
 
-import HealthKitReporter
-
 final class StreamHandlerFactory: NSObject {
     static func make(with reporter: HealthKitReporter, for event: EventChannel) throws -> StreamHandlerProtocol {
         switch event {

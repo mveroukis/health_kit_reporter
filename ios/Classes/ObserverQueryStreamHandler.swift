@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import HealthKitReporter
 
 public final class ObserverQueryStreamHandler: NSObject {
     public let reporter: HealthKitReporter

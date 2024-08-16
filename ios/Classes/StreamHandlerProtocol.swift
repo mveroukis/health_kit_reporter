@@ -5,8 +5,6 @@
 //  Created by Victor Kachalov on 09.12.20.
 //
 
-import HealthKitReporter
-
 public protocol StreamHandlerProtocol: FlutterStreamHandler & NSObjectProtocol {
     var reporter: HealthKitReporter { get }
     var activeQueries: Set<Query> { get set }

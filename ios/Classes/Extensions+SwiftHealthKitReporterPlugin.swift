@@ -6,7 +6,6 @@
 //
 
 import Flutter
-import HealthKitReporter
 import HealthKit
 
 // MARK: - MethodCall
