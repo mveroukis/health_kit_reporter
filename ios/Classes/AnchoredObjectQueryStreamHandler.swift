@@ -6,21 +6,32 @@
 //
 
 import Foundation
+import HealthKit
 
 public final class AnchoredObjectQueryStreamHandler: NSObject {
     public let reporter: HealthKitReporter
     public var activeQueries = Set<Query>()
     public var plannedQueries = Set<Query>()
-
+    
     init(reporter: HealthKitReporter) {
         self.reporter = reporter
     }
 }
+
+extension HKQueryAnchor {
+    func toBytes() throws -> [UInt8] {
+        let rawData = try NSKeyedArchiver.archivedData(withRootObject: self, requiringSecureCoding: true)
+        let bytes = [UInt8](rawData)
+
+        return bytes
+    }
+}
+
 // MARK: - StreamHandlerProtocol
 extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
     public func setQueries(arguments: [String: Any], events: @escaping FlutterEventSink) throws {
         guard
-            let identifiers = arguments["identifiers"] as? [String],
+            let identifiers = arguments["identifiers"] as? [String : [UInt8]?], //[String],
             let startTimestamp = arguments["startTimestamp"] as? Double,
             let endTimestamp = arguments["endTimestamp"] as? Double
         else {
@@ -31,7 +42,7 @@ extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
             endDate: Date.make(from: endTimestamp)
         )
         for identifier in identifiers {
-            guard let type = identifier.objectType as? SampleType else {
+            guard let type = identifier.key.objectType as? SampleType else {
                 return
             }
             let query = try reporter.reader.anchoredObjectQuery(
@@ -44,6 +55,7 @@ extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
                 }
                 var jsonDictionary: [String: Any] = [:]
                 var samplesArray: [String] = []
+
                 for sample in samples {
                     do {
                         let encoded = try sample.encoded()
@@ -61,18 +73,23 @@ extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
                         continue
                     }
                 }
+
                 jsonDictionary["samples"] = samplesArray
                 jsonDictionary["deletedObjects"] = deletedObjectsArray
+                jsonDictionary["anchor"] = try? anchor?.toBytes() ?? [UInt8()]
+
                 events(jsonDictionary)
             }
+
             plannedQueries.insert(query)
         }
     }
-
+    
     public static func make(with reporter: HealthKitReporter) -> AnchoredObjectQueryStreamHandler {
         AnchoredObjectQueryStreamHandler(reporter: reporter)
     }
 }
+
 // MARK: - FlutterStreamHandler
 extension AnchoredObjectQueryStreamHandler: FlutterStreamHandler {
     public func onListen(

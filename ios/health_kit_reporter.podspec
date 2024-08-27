@@ -2,6 +2,7 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
 # Run `pod lib lint health_kit_reporter.podspec' to validate before publishing.
 #
+
 Pod::Spec.new do |s|
   s.name                  = 'health_kit_reporter'
   s.version               = '2.1.0'
@@ -11,11 +12,14 @@ Pod::Spec.new do |s|
   s.homepage              = 'https://github.com/VictorKachalov/health_kit_reporter'
   s.license               = { :type => 'MIT', :file => '../LICENSE' }
   s.author                = { 'Victor Kachalov' => 'victorkachalov@gmail.com' }
+  s.platform              = :ios, '16.0'
+  s.frameworks            = 'Foundation'
   s.source                = { :path => '.' }
   s.social_media_url      = 'https://twitter.com/Victor_Kachalov'
   s.ios.deployment_target = '16.0'
   s.source_files          = 'Classes/**/*'
-  s.platform              = :ios, '16.0'
+  s.resources             = "Classes/**/*.{xcdatamodeld}"
+
 
   s.dependency 'Flutter'
 ###  s.dependency 'HealthKitReporter', '3.0.0'

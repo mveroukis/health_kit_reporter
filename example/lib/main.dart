@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -79,8 +80,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     final initializationSettingsIOs = IOSInitializationSettings();
     final initSettings = InitializationSettings(iOS: initializationSettingsIOs);
-    _flutterLocalNotificationsPlugin.initialize(initSettings,
-        onSelectNotification: (string) {
+    _flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: (string) {
       print(string);
       return Future.value(string);
     });
@@ -127,8 +127,7 @@ class _MyAppState extends State<MyApp> {
               _ReadView(),
               _WriteView(),
               _ObserveView(
-                flutterLocalNotificationsPlugin:
-                    _flutterLocalNotificationsPlugin,
+                flutterLocalNotificationsPlugin: _flutterLocalNotificationsPlugin,
               ),
               _DeleteView(),
             ],
@@ -157,8 +156,7 @@ class _MyAppState extends State<MyApp> {
         QuantityType.bloodPressureSystolic.identifier,
         //CorrelationType.bloodPressure.identifier,
       ];
-      final isRequested =
-          await HealthKitReporter.requestAuthorization(readTypes, writeTypes);
+      final isRequested = await HealthKitReporter.requestAuthorization(readTypes, writeTypes);
       print('isRequested auth: $isRequested');
     } catch (e) {
       print(e);
@@ -238,25 +236,20 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
   }
 
   void multipleQuery() async {
-    final prefUnits =
-        await HealthKitReporter.preferredUnits([QuantityType.heartRate]);
+    final prefUnits = await HealthKitReporter.preferredUnits([QuantityType.heartRate]);
     final hrUnits = prefUnits.first.unit;
 
     final now = DateTime.now();
 
     for (int _ in List.generate(10, (index) => index + 1)) {
-      final hbQuery = await HealthKitReporter.quantityQuery(
-          QuantityType.heartRate,
-          hrUnits,
-          Predicate(now.subtract(Duration(seconds: 120 * 60 * 24)), now));
+      final hbQuery = await HealthKitReporter.quantityQuery(QuantityType.heartRate, hrUnits, Predicate(now.subtract(Duration(seconds: 120 * 60 * 24)), now));
       print(hbQuery.map((e) => e.harmonized.value));
     }
   }
 
   void querySamples() async {
     try {
-      final samples = await HealthKitReporter.sampleQuery(
-          QuantityType.stepCount.identifier, predicate);
+      final samples = await HealthKitReporter.sampleQuery(QuantityType.stepCount.identifier, predicate);
       print('samples: ${samples.map((e) => e.map).toList()}');
     } catch (e) {
       print(e);
@@ -265,8 +258,7 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
 
   void queryCategory() async {
     try {
-      final categories = await HealthKitReporter.categoryQuery(
-          CategoryType.sleepAnalysis, predicate);
+      final categories = await HealthKitReporter.categoryQuery(CategoryType.sleepAnalysis, predicate);
       print('categories: ${categories.map((e) => e.map).toList()}');
     } catch (e) {
       print(e);
@@ -323,11 +315,9 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
         print('preferredUnit: ${preferredUnit.map}');
         final type = QuantityTypeFactory.from(identifier);
         try {
-          final quantities =
-              await HealthKitReporter.quantityQuery(type, unit, predicate);
+          final quantities = await HealthKitReporter.quantityQuery(type, unit, predicate);
           print('quantity: ${quantities.map((e) => e.map).toList()}');
-          final statistics =
-              await HealthKitReporter.statisticsQuery(type, unit, predicate);
+          final statistics = await HealthKitReporter.statisticsQuery(type, unit, predicate);
           print('statistics: ${statistics.map}');
         } catch (e) {
           print(e);
@@ -340,8 +330,7 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
 
   void queryActivitySummary() async {
     try {
-      final activitySummary =
-          await HealthKitReporter.queryActivitySummary(predicate);
+      final activitySummary = await HealthKitReporter.queryActivitySummary(predicate);
       print('activitySummary: ${activitySummary.map((e) => e.map).toList()}');
     } catch (e) {
       print(e);
@@ -350,11 +339,8 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
 
   void queryElectrocardiograms() async {
     try {
-      final electrocardiograms = await HealthKitReporter.electrocardiogramQuery(
-          predicate,
-          withVoltageMeasurements: true);
-      print(
-          'electrocardiograms: ${electrocardiograms.map((e) => e.map).toList()}');
+      final electrocardiograms = await HealthKitReporter.electrocardiogramQuery(predicate, withVoltageMeasurements: true);
+      print('electrocardiograms: ${electrocardiograms.map((e) => e.map).toList()}');
     } catch (e) {
       print(e);
     }
@@ -362,8 +348,7 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
 
   void queryCorrelations() async {
     try {
-      final correlations = await HealthKitReporter.correlationQuery(
-          CorrelationType.bloodPressure.identifier, predicate);
+      final correlations = await HealthKitReporter.correlationQuery(CorrelationType.bloodPressure.identifier, predicate);
       print('correlations: ${correlations.map((e) => e.map).toList()}');
     } catch (e) {
       print(e);
@@ -372,8 +357,7 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
 
   void querySources() async {
     try {
-      final sources = await HealthKitReporter.sourceQuery(
-          QuantityType.stepCount.identifier, predicate);
+      final sources = await HealthKitReporter.sourceQuery(QuantityType.stepCount.identifier, predicate);
       print('sources: ${sources.map((e) => e.map).toList()}');
     } catch (e) {
       print(e);
@@ -418,20 +402,20 @@ class _WriteView extends StatelessWidget with HealthKitReporterMixin {
 
   void saveSteps() async {
     try {
-      final canWrite = await HealthKitReporter.isAuthorizedToWrite(
-          QuantityType.stepCount.identifier);
+      final canWrite = await HealthKitReporter.isAuthorizedToWrite(QuantityType.stepCount.identifier);
       if (canWrite) {
         final now = DateTime.now();
         final minuteAgo = now.add(Duration(minutes: -1));
         final harmonized = QuantityHarmonized(100, 'count', null);
         final steps = Quantity(
-            'testStepsUUID',
-            QuantityType.stepCount.identifier,
-            minuteAgo.millisecondsSinceEpoch,
-            now.millisecondsSinceEpoch,
-            device,
-            sourceRevision,
-            harmonized);
+          'testStepsUUID',
+          QuantityType.stepCount.identifier,
+          minuteAgo.millisecondsSinceEpoch,
+          now.millisecondsSinceEpoch,
+          device,
+          sourceRevision,
+          harmonized,
+        );
         print('try to save: ${steps.map}');
         final saved = await HealthKitReporter.save(steps);
         print('stepsSaved: $saved');
@@ -445,8 +429,7 @@ class _WriteView extends StatelessWidget with HealthKitReporterMixin {
 
   void saveWorkout() async {
     try {
-      final canWrite = await HealthKitReporter.isAuthorizedToWrite(
-          WorkoutType.workoutType.identifier);
+      final canWrite = await HealthKitReporter.isAuthorizedToWrite(WorkoutType.workoutType.identifier);
       if (canWrite) {
         final harmonized = WorkoutHarmonized(
           WorkoutActivityType.badminton,
@@ -496,8 +479,7 @@ class _WriteView extends StatelessWidget with HealthKitReporterMixin {
 
   void saveMindfulMinutes() async {
     try {
-      final canWrite = await HealthKitReporter.isAuthorizedToWrite(
-          CategoryType.mindfulSession.identifier);
+      final canWrite = await HealthKitReporter.isAuthorizedToWrite(CategoryType.mindfulSession.identifier);
       if (canWrite) {
         final now = DateTime.now();
         final minuteAgo = now.add(Duration(minutes: -1));
@@ -531,31 +513,13 @@ class _WriteView extends StatelessWidget with HealthKitReporterMixin {
     try {
       final now = DateTime.now();
       final minuteAgo = now.add(Duration(minutes: -1));
-      final sys = Quantity(
-          'testSysUUID234',
-          QuantityType.bloodPressureSystolic.identifier,
-          minuteAgo.millisecondsSinceEpoch,
-          now.millisecondsSinceEpoch,
-          device,
-          sourceRevision,
+      final sys = Quantity('testSysUUID234', QuantityType.bloodPressureSystolic.identifier, minuteAgo.millisecondsSinceEpoch, now.millisecondsSinceEpoch, device, sourceRevision,
           QuantityHarmonized(123, 'mmHg', null));
-      final dia = Quantity(
-          'testDiaUUID456',
-          QuantityType.bloodPressureDiastolic.identifier,
-          minuteAgo.millisecondsSinceEpoch,
-          now.millisecondsSinceEpoch,
-          device,
-          sourceRevision,
+      final dia = Quantity('testDiaUUID456', QuantityType.bloodPressureDiastolic.identifier, minuteAgo.millisecondsSinceEpoch, now.millisecondsSinceEpoch, device, sourceRevision,
           QuantityHarmonized(89, 'mmHg', null));
       final correlationJarmonized = CorrelationHarmonized([sys, dia], [], null);
       final correlation = Correlation(
-          'test',
-          CorrelationType.bloodPressure.identifier,
-          minuteAgo.millisecondsSinceEpoch,
-          now.millisecondsSinceEpoch,
-          device,
-          sourceRevision,
-          correlationJarmonized);
+          'test', CorrelationType.bloodPressure.identifier, minuteAgo.millisecondsSinceEpoch, now.millisecondsSinceEpoch, device, sourceRevision, correlationJarmonized);
       final saved = await HealthKitReporter.save(correlation);
       print('BloodPressureCorrelationSaved: $saved');
     } catch (e) {
@@ -586,10 +550,10 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
             child: Text('observerQuery - STEPS and HR')),
         TextButton(
             onPressed: () {
-              anchoredObjectQuery([
-                QuantityType.stepCount.identifier,
-                QuantityType.heartRate.identifier,
-              ]);
+              anchoredObjectQuery({
+                QuantityType.stepCount.identifier: null,
+                QuantityType.heartRate.identifier: null,
+              });
             },
             child: Text('anchoredObjectQuery - STEPS and HR')),
         TextButton(
@@ -608,19 +572,16 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
 
   void observerQuery(List<String> identifiers) async {
     try {
-      final sub = HealthKitReporter.observerQuery(identifiers, null,
-          onUpdate: (identifier) async {
+      final sub = HealthKitReporter.observerQuery(identifiers, null, onUpdate: (identifier) async {
         print('Updates for observerQuerySub - $identifier');
         print(identifier);
         final iOSDetails = IOSNotificationDetails();
         final details = NotificationDetails(iOS: iOSDetails);
-        await flutterLocalNotificationsPlugin.show(
-            0, 'Observer', identifier, details);
+        await flutterLocalNotificationsPlugin.show(0, 'Observer', identifier, details);
       });
       print('$identifiers observerQuerySub: $sub');
       for (final identifier in identifiers) {
-        final isSet = await HealthKitReporter.enableBackgroundDelivery(
-            identifier, UpdateFrequency.immediate);
+        final isSet = await HealthKitReporter.enableBackgroundDelivery(identifier, UpdateFrequency.immediate);
         print('$identifier enableBackgroundDelivery: $isSet');
       }
     } catch (e) {
@@ -628,14 +589,24 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
     }
   }
 
-  void anchoredObjectQuery(List<String> identifiers) {
+  void anchoredObjectQuery(Map<String, Uint8List?> identifiers) {
     try {
-      final sub = HealthKitReporter.anchoredObjectQuery(identifiers, predicate,
-          onUpdate: (samples, deletedObjects) {
+      final sub = HealthKitReporter.anchoredObjectQuery(
+          identifiers, //
+          predicate, //
+          onUpdate: (samples, deletedObjects, identifier, anchor) {
         print('Updates for anchoredObjectQuerySub');
+
+        print("Samples:");
         print(samples.map((e) => e.map).toList());
+
+        print("deletedObjects:");
         print(deletedObjects.map((e) => e.map).toList());
+
+        print("IDENTIFIER: $identifier");
+        print("ANCHOR: $anchor");
       });
+
       print('$identifiers anchoredObjectQuerySub: $sub');
     } catch (e) {
       print(e);
@@ -644,8 +615,7 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
 
   void queryActivitySummaryUpdates() {
     try {
-      final sub = HealthKitReporter.queryActivitySummaryUpdates(predicate,
-          onUpdate: (samples) {
+      final sub = HealthKitReporter.queryActivitySummaryUpdates(predicate, onUpdate: (samples) {
         print('Updates for activitySummaryUpdatesSub');
         print(samples.map((e) => e.map).toList());
       });
