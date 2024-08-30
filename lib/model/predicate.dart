@@ -11,9 +11,9 @@ import 'package:health_kit_reporter/health_kit_reporter.dart';
 ///
 class Predicate {
   const Predicate(
-    this.startDate,
+    this.startDate, {
     this.endDate,
-  );
+  });
 
   final DateTime startDate;
   final DateTime? endDate;
