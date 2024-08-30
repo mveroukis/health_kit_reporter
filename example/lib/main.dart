@@ -35,7 +35,7 @@ void main() {
 mixin HealthKitReporterMixin {
   Predicate get predicate => Predicate(
         DateTime.now().add(Duration(days: -365)),
-        null, //DateTime.now(),
+        // DateTime.now(),
       );
 
   Device get device => Device(
@@ -242,7 +242,7 @@ class _ReadView extends StatelessWidget with HealthKitReporterMixin {
     final now = DateTime.now();
 
     for (int _ in List.generate(10, (index) => index + 1)) {
-      final hbQuery = await HealthKitReporter.quantityQuery(QuantityType.heartRate, hrUnits, Predicate(now.subtract(Duration(seconds: 120 * 60 * 24)), now));
+      final hbQuery = await HealthKitReporter.quantityQuery(QuantityType.heartRate, hrUnits, Predicate(now.subtract(Duration(seconds: 120 * 60 * 24)), endDate: now));
       print(hbQuery.map((e) => e.harmonized.value));
     }
   }
@@ -691,7 +691,7 @@ class _DeleteView extends StatelessWidget with HealthKitReporterMixin {
           QuantityType.stepCount.identifier,
           Predicate(
             DateTime.now().add(Duration(days: -1)),
-            DateTime.now(),
+            endDate: DateTime.now(),
           ));
       print(map);
     } catch (e) {
