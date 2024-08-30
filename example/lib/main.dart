@@ -35,7 +35,7 @@ void main() {
 mixin HealthKitReporterMixin {
   Predicate get predicate => Predicate(
         DateTime.now().add(Duration(days: -365)),
-        DateTime.now(),
+        null, //DateTime.now(),
       );
 
   Device get device => Device(
@@ -605,6 +605,7 @@ class _ObserveViewState extends State<_ObserveView> with HealthKitReporterMixin 
       final sub = HealthKitReporter.anchoredObjectQuery(
           identifiers, //
           predicate, //
+          excludeManual: true, //
           onUpdate: (samples, deletedObjects, identifier, anchor) {
         print('Updates for anchoredObjectQuerySub');
 

@@ -164,9 +164,11 @@ class HealthKitReporter {
     AnchoredIdentifier anchoredIdentifiers, // Identifiers along with the anchor. The anchor should be null if this is the first time calling.
     Predicate predicate, {
     required Function(List<Sample>, List<DeletedObject>, String identifier, Uint8List anchor) onUpdate,
+    bool excludeManual = false,
   }) {
     final arguments = <String, dynamic>{
       'identifiers': anchoredIdentifiers,
+      'excludeManual': excludeManual,
     };
     arguments.addAll(predicate.map);
 
@@ -234,7 +236,7 @@ class HealthKitReporter {
   static StreamSubscription<dynamic> statisticsCollectionQuery(
       List<PreferredUnit> preferredUnits, Predicate predicate, DateTime anchorDate, DateTime enumerateFrom, DateTime enumerateTo, DateComponents intervalComponents,
       {required Function(Statistics) onUpdate}) {
-    final arguments = {
+    final Map<String, Object?> arguments = {
       'preferredUnits': preferredUnits.map((e) => e.map).toList(),
       'anchorTimestamp': anchorDate.millisecondsSinceEpoch,
       'enumerateFrom': enumerateFrom.millisecondsSinceEpoch,

@@ -47,15 +47,17 @@ extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
     public func setQueries(arguments: [String: Any], events: @escaping FlutterEventSink) throws {
         guard
             let anchoredIdentifiers = arguments["identifiers"] as? [String : FlutterStandardTypedData?],
-            let startTimestamp = arguments["startTimestamp"] as? Double,
-            let endTimestamp = arguments["endTimestamp"] as? Double
+            let startTimestamp = arguments["startTimestamp"] as? Double
         else {
             return
         }
 
+        let endTimestamp = arguments["endTimestamp"] as? Double
+        let excludeManual = arguments["excludeManual"] as? Bool ?? false
         let predicate = NSPredicate.samplesPredicate(
             startDate: Date.make(from: startTimestamp),
-            endDate: Date.make(from: endTimestamp)
+            endDate: endTimestamp != nil ? Date.make(from: endTimestamp!) : nil,
+            excludeManual: excludeManual
         )
 
         for anchoredIdentifier in anchoredIdentifiers {

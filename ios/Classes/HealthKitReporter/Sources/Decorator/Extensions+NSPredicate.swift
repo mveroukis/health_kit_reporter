@@ -17,14 +17,34 @@ public extension NSPredicate {
     }
     static func samplesPredicate(
         startDate: Date,
-        endDate: Date,
+        endDate: Date?,
+        excludeManual: Bool = false,
         options: HKQueryOptions = [.strictStartDate, .strictEndDate]
     ) -> NSPredicate {
-        return HKQuery.predicateForSamples(
+        let predicateForSamples = HKQuery.predicateForSamples(
             withStart: startDate,
             end: endDate,
             options: options
         )
+        
+        if excludeManual {
+            let predicateExcludeManual = NSPredicate(format: "metadata.%K != YES", HKMetadataKeyWasUserEntered)
+
+            return NSCompoundPredicate(andPredicateWithSubpredicates: [
+                predicateExcludeManual,
+                predicateForSamples
+                //HKQuery.predicateForSamples(withStart: startDate, end: nil)
+            ])
+        }
+        else {
+            return predicateForSamples
+        }
+        
+//        return HKQuery.predicateForSamples(
+//            withStart: startDate,
+//            end: endDate,
+//            options: options
+//        )
     }
     @available(iOS 9.3, *)
     static func activitySummaryPredicate(
