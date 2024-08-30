@@ -175,7 +175,6 @@ class HealthKitReporter {
       final anchorObjects = map["anchor"] as List<Object?>;
       final anchorInts = anchorObjects.map((x) => x! as int).toList();
       final Uint8List anchor = Uint8List.fromList(anchorInts);
-
       final samplesList = List.from(map['samples']);
       final samples = <Sample>[];
 

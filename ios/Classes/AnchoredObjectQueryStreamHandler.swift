@@ -27,27 +27,48 @@ extension HKQueryAnchor {
     }
 }
 
+extension [UInt8] {
+    func toHKQueryAnchor() -> HKQueryAnchor {
+        let data = Data(self)
+        let decodedAnchor = try? NSKeyedUnarchiver.unarchivedObject(ofClass: HKQueryAnchor.self, from: data)
+        
+        return decodedAnchor!
+    }
+}
+
+extension Data {
+    var bytes: [UInt8] {
+        return [UInt8](self)
+    }
+}
+
 // MARK: - StreamHandlerProtocol
 extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
     public func setQueries(arguments: [String: Any], events: @escaping FlutterEventSink) throws {
         guard
-            let identifiers = arguments["identifiers"] as? [String : [UInt8]?], //[String],
+            let anchoredIdentifiers = arguments["identifiers"] as? [String : FlutterStandardTypedData?],
             let startTimestamp = arguments["startTimestamp"] as? Double,
             let endTimestamp = arguments["endTimestamp"] as? Double
         else {
             return
         }
+
         let predicate = NSPredicate.samplesPredicate(
             startDate: Date.make(from: startTimestamp),
             endDate: Date.make(from: endTimestamp)
         )
-        for identifier in identifiers {
-            guard let type = identifier.key.objectType as? SampleType else {
+
+        for anchoredIdentifier in anchoredIdentifiers {
+            guard let type = anchoredIdentifier.key.objectType as? SampleType else {
                 return
             }
+
+            let anchorData = anchoredIdentifier.value?.data
+            let anchorBytes = anchorData?.bytes
             let query = try reporter.reader.anchoredObjectQuery(
                 type: type,
                 predicate: predicate,
+                anchor: anchorBytes?.toHKQueryAnchor(),
                 monitorUpdates: true
             ) { (query, samples, deletedObjects, anchor, error) in
                 guard error == nil else {

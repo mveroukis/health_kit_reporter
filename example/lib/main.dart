@@ -528,13 +528,21 @@ class _WriteView extends StatelessWidget with HealthKitReporterMixin {
   }
 }
 
-class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
+class _ObserveView extends StatefulWidget {
   const _ObserveView({
     Key? key,
     required this.flutterLocalNotificationsPlugin,
   }) : super(key: key);
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  @override
+  State<_ObserveView> createState() => _ObserveViewState();
+}
+
+class _ObserveViewState extends State<_ObserveView> with HealthKitReporterMixin {
+  Uint8List? stepCountAnchor;
+  Uint8List? heartRateAnchor;
 
   @override
   Widget build(BuildContext context) {
@@ -551,8 +559,11 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
         TextButton(
             onPressed: () {
               anchoredObjectQuery({
-                QuantityType.stepCount.identifier: null,
-                QuantityType.heartRate.identifier: null,
+                QuantityType.stepCount.identifier: stepCountAnchor,
+                QuantityType.heartRate.identifier: heartRateAnchor,
+              }, onUpdate: (id, anchor) {
+                if (id == QuantityType.stepCount.identifier) stepCountAnchor = anchor;
+                if (id == QuantityType.heartRate.identifier) heartRateAnchor = anchor;
               });
             },
             child: Text('anchoredObjectQuery - STEPS and HR')),
@@ -577,7 +588,7 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
         print(identifier);
         final iOSDetails = IOSNotificationDetails();
         final details = NotificationDetails(iOS: iOSDetails);
-        await flutterLocalNotificationsPlugin.show(0, 'Observer', identifier, details);
+        await widget.flutterLocalNotificationsPlugin.show(0, 'Observer', identifier, details);
       });
       print('$identifiers observerQuerySub: $sub');
       for (final identifier in identifiers) {
@@ -589,7 +600,7 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
     }
   }
 
-  void anchoredObjectQuery(Map<String, Uint8List?> identifiers) {
+  void anchoredObjectQuery(Map<String, Uint8List?> identifiers, {Function(String, Uint8List)? onUpdate}) {
     try {
       final sub = HealthKitReporter.anchoredObjectQuery(
           identifiers, //
@@ -605,6 +616,8 @@ class _ObserveView extends StatelessWidget with HealthKitReporterMixin {
 
         print("IDENTIFIER: $identifier");
         print("ANCHOR: $anchor");
+
+        onUpdate?.call(identifier, anchor);
       });
 
       print('$identifiers anchoredObjectQuerySub: $sub');
