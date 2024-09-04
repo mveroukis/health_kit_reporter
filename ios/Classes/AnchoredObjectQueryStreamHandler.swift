@@ -74,6 +74,7 @@ extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
                 monitorUpdates: true
             ) { (query, samples, deletedObjects, anchor, error) in
                 guard error == nil else {
+                    print("AnchoredObjectQueryStreamHandler: Error \(error!)")
                     return
                 }
                 var jsonDictionary: [String: Any] = [:]
@@ -101,7 +102,9 @@ extension AnchoredObjectQueryStreamHandler: StreamHandlerProtocol {
                 jsonDictionary["deletedObjects"] = deletedObjectsArray
                 jsonDictionary["anchor"] = try? anchor?.toBytes() ?? [UInt8()]
 
-                events(jsonDictionary)
+                DispatchQueue.main.async {
+                    events(jsonDictionary)
+                }
             }
 
             plannedQueries.insert(query)
