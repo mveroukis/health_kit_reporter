@@ -465,6 +465,8 @@ class _WriteView extends StatelessWidget with HealthKitReporterMixin {
           harmonized,
           duration,
           events,
+          "My App",
+          "com.example.app"
         );
         print('try to save: ${workout.map}');
         final saved = await HealthKitReporter.save(workout);

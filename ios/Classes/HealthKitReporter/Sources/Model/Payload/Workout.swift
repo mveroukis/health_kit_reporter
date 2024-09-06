@@ -33,6 +33,7 @@ public struct Workout: Identifiable, Sample {
             totalFlightsClimbed: Double?,
             totalFlightsClimbedUnit: String,
             metadata: Metadata?
+
         ) {
             self.value = value
             self.description = description
@@ -85,6 +86,8 @@ public struct Workout: Identifiable, Sample {
     public let duration: Double
     public let workoutEvents: [WorkoutEvent]
     public let harmonized: Harmonized
+    public let appName: String?
+    public let appIdentifier: String?
 
     init(workout: HKWorkout) throws {
         self.uuid = workout.uuid.uuidString
@@ -94,6 +97,9 @@ public struct Workout: Identifiable, Sample {
         self.device = Device(device: workout.device)
         self.sourceRevision = SourceRevision(sourceRevision: workout.sourceRevision)
         self.duration = workout.duration
+        self.appName = workout.sourceRevision.source.name
+        self.appIdentifier = workout.sourceRevision.source.bundleIdentifier
+
         guard #available(iOS 11.0, *) else {
             throw HealthKitError.notAvailable(
                 "WorkoutEvents is not available for the current iOS"
@@ -122,7 +128,9 @@ public struct Workout: Identifiable, Sample {
         sourceRevision: SourceRevision,
         duration: Double,
         workoutEvents: [WorkoutEvent],
-        harmonized: Harmonized
+        harmonized: Harmonized,
+        appName: String?,
+        appIdentifier: String?
     ) {
         self.uuid = UUID().uuidString
         self.identifier = identifier
@@ -133,6 +141,8 @@ public struct Workout: Identifiable, Sample {
         self.duration = duration
         self.workoutEvents = workoutEvents
         self.harmonized = harmonized
+        self.appName = appName
+        self.appIdentifier = appIdentifier
     }
 
     public func copyWith(
@@ -143,7 +153,9 @@ public struct Workout: Identifiable, Sample {
         sourceRevision: SourceRevision? = nil,
         duration: Double? = nil,
         workoutEvents: [WorkoutEvent]? = nil,
-        harmonized: Harmonized? = nil
+        harmonized: Harmonized? = nil,
+        appName: String? = nil,
+        appIdentifier: String? = nil
     ) -> Workout {
         return Workout(
             identifier: identifier ?? self.identifier,
@@ -153,7 +165,9 @@ public struct Workout: Identifiable, Sample {
             sourceRevision: sourceRevision ?? self.sourceRevision,
             duration: duration ?? self.duration,
             workoutEvents: workoutEvents ?? self.workoutEvents,
-            harmonized: harmonized ?? self.harmonized
+            harmonized: harmonized ?? self.harmonized,
+            appName: appName ?? self.appName,
+            appIdentifier: appIdentifier ?? self.appIdentifier
         )
     }
 }
@@ -215,6 +229,9 @@ extension Workout: Payload {
         }
         let device = dictionary["device"] as? [String: Any]
         let workoutEvents = dictionary["workoutEvents"] as? [[String: Any]]
+        let appName = dictionary["appName"] as? String
+        let appIdentifier = dictionary["appIdentifier"] as? String
+
         return Workout(
             identifier: identifier,
             startTimestamp: Double(truncating: startTimestamp),
@@ -229,7 +246,9 @@ extension Workout: Payload {
                     try WorkoutEvent.make(from: $0)
                 }
                 : [],
-            harmonized: try Harmonized.make(from: harmonized)
+            harmonized: try Harmonized.make(from: harmonized),
+            appName: appName,
+            appIdentifier: appIdentifier
         )
     }
     public static func collect(

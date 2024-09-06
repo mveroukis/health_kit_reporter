@@ -27,6 +27,8 @@ class Workout extends Sample<WorkoutHarmonized> {
     WorkoutHarmonized harmonized,
     this.duration,
     this.workoutEvents,
+    this.appName,
+    this.appIdentifier,
   ) : super(
           uuid,
           identifier,
@@ -39,6 +41,8 @@ class Workout extends Sample<WorkoutHarmonized> {
 
   final num duration;
   final List<WorkoutEvent> workoutEvents;
+  final String? appName;
+  final String? appIdentifier;
 
   /// General map representation
   ///
@@ -53,6 +57,8 @@ class Workout extends Sample<WorkoutHarmonized> {
         'duration': duration,
         'workoutEvents': workoutEvents.map((e) => e.map).toList(),
         'harmonized': harmonized.map,
+        'appName': appName,
+        'appIdentifier': appIdentifier,
       };
 
   /// General constructor from JSON payload
@@ -60,6 +66,8 @@ class Workout extends Sample<WorkoutHarmonized> {
   Workout.fromJson(Map<String, dynamic> json)
       : duration = json['duration'],
         workoutEvents = WorkoutEvent.collect(json['workoutEvents']),
+        appName = json['appName'],
+        appIdentifier = json['appIdentifier'],
         super.from(json, WorkoutHarmonized.fromJson(json['harmonized']));
 }
 
